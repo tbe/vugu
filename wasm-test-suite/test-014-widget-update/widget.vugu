@@ -1,0 +1,6 @@
+<div vg-if="c.Hidden == false">
+    <div id="div1">
+        <button id="deletebtn" @click='c.DeleteHandler(event)'>delete</button>
+        <p>My Content</p>
+    </div>
+</div>

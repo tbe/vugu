@@ -395,6 +395,23 @@ func Test013Issue117(t *testing.T) {
 
 }
 
+func Test014WidgetUpdate(t *testing.T) {
+	dir, origDir := mustUseDir("test-014-widget-update")
+	defer os.Chdir(origDir)
+	mustGen(dir)
+	pathSuffix := mustBuildAndLoad(dir)
+	ctx, cancel := mustChromeCtx()
+	defer cancel()
+
+	log.Printf("URL: %s", "http://localhost:8846"+pathSuffix)
+	must(chromedp.Run(ctx,
+		chromedp.Navigate("http://localhost:8846"+pathSuffix),
+		chromedp.WaitVisible("#div1"),
+		chromedp.Click("#deletebtn"),
+		chromedp.WaitNotPresent("#div1"),
+	))
+}
+
 func Test100TinygoSimple(t *testing.T) {
 
 	// TODO: This is work in progress - it does actually compile but needs some more work to
