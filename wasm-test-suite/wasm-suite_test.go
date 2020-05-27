@@ -587,7 +587,7 @@ func Test018CompEvents(t *testing.T) {
 		chromedp.WaitVisible("#show_text"), // wait for it to dump event out
 		chromedp.InnerHTML("#show_text", &showText),
 	))
-	//t.Logf("showText=%s", showText)
+	// t.Logf("showText=%s", showText)
 	assert.Contains(showText, "ClickEvent")
 
 }
@@ -690,6 +690,32 @@ func Test021Slots(t *testing.T) {
 		t.Errorf("missing vg-var reference in root_vgen.go")
 	}
 
+}
+
+func Test022VGSetter(t *testing.T) {
+
+	// assert := assert.New(t)
+
+	dir, origDir := mustUseDir("test-022-vgsetter")
+	defer os.Chdir(origDir)
+	mustGen(dir)
+	pathSuffix := mustBuildAndLoad(dir)
+	ctx, cancel := mustChromeCtx()
+	defer cancel()
+
+	log.Printf("URL: %s", "http://localhost:8846"+pathSuffix)
+
+	must(chromedp.Run(ctx,
+		chromedp.Navigate("http://localhost:8846"+pathSuffix),
+		chromedp.WaitVisible("#button"),
+		chromedp.Click("#button"),
+		chromedp.WaitVisible("#clicked"),
+		queryAttributes("#button", func(attr map[string]string) {
+			assert.Equal(t, "changed", attr["data-some"], "wrong value for SomeAttr")
+			assert.Equal(t, "changed", attr["data-other"], "wrong value for OtherAttr")
+			assert.Equal(t, "c", attr["data-third"], "wrong value for ThirdAttr")
+		}),
+	))
 }
 
 func Test100TinygoSimple(t *testing.T) {

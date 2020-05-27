@@ -1,0 +1,37 @@
+<div>
+    <button :id="c.Id" @click="c.OnClickRun(event)" :data-some="c.SomeAttr" :data-other="c.OtherAttr"
+            :data-third="c.ThirdAttr">
+        Test
+    </button>
+    <div id="clicked" vg-if="c.Clicked">clicked</div>
+</div>
+
+<script type="application/x-go">
+
+    type DemoButton struct {
+        SomeAttr  string `vugu:"data"`
+        OtherAttr string `vugu:"data"`
+        ThirdAttr string `vugu:"data"`
+        Id        string
+        Clicked   bool    `vugu:"data"`
+    }
+
+    func (c *DemoButton) OnClickRun(event vugu.DOMEvent) {
+        c.SomeAttr = "changed"
+        c.OtherAttr = "changed"
+        c.ThirdAttr = "changed"
+        c.Clicked = true
+    }
+
+    func (c *DemoButton) SetSomeAttr(val interface{}) {
+        if c.SomeAttr == "" {
+            c.SomeAttr = val.(string)
+        }
+    }
+
+    func (c *DemoButton) SetOther(val interface{}) {
+        if c.OtherAttr == "" {
+            c.OtherAttr = val.(string)
+        }
+    }
+</script>

@@ -101,6 +101,24 @@ func vgCompExpr(n *html.Node) string {
 	return ""
 }
 
+func vgSetterExpr(n *html.Node) map[string]string {
+	setterMap := make(map[string]string)
+	for _, a := range n.Attr {
+		if a.Key == "vg-setters" {
+			for _, f := range strings.Fields(a.Val) {
+				kv := strings.SplitN(f, "=", 2)
+				if len(kv) < 2 {
+					setterMap[kv[0]] = "Set" + kv[0]
+				} else {
+					setterMap[kv[0]] = kv[1]
+				}
+			}
+			break
+		}
+	}
+	return setterMap
+}
+
 // func vgIfExprx(n *htmlx.Node) string {
 // 	for _, a := range n.Attr {
 // 		if a.Key == "vg-if" {

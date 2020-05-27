@@ -19,6 +19,7 @@ import (
 	// "golang.org/x/net/html/atom"
 	"github.com/vugu/html"
 	"github.com/vugu/html/atom"
+
 	"github.com/vugu/vugu"
 )
 
@@ -986,6 +987,9 @@ func (p *ParserGo) visitNodeComponentElement(state *parseGoState, n *html.Node) 
 		fmt.Fprintf(&state.buildBuf, "_ = %s\n", vgv) // avoid unused var error
 	}
 
+	// get a list of attributes that should utilize a setter
+	setterMap := vgSetterExpr(n)
+
 	didAttrMap := false
 
 	// dynamic attrs
@@ -999,7 +1003,11 @@ func (p *ParserGo) visitNodeComponentElement(state *parseGoState, n *html.Node) 
 
 		// if starts with upper case, it's a field name
 		if hasUpperFirst(k) {
-			fmt.Fprintf(&state.buildBuf, "vgcomp.%s = %s\n", k, valExpr)
+			if setter, ok := setterMap[k]; ok {
+				fmt.Fprintf(&state.buildBuf,"vgcomp.%s(%s)\n",setter,valExpr)
+			} else {
+				fmt.Fprintf(&state.buildBuf, "vgcomp.%s = %s\n", k, valExpr)
+			}
 		} else {
 			// otherwise we use an "AttrMap"
 			if !didAttrMap {
@@ -1016,7 +1024,11 @@ func (p *ParserGo) visitNodeComponentElement(state *parseGoState, n *html.Node) 
 	for _, a := range vgAttrs {
 		// if starts with upper case, it's a field name
 		if hasUpperFirst(a.Key) {
-			fmt.Fprintf(&state.buildBuf, "vgcomp.%s = %q\n", a.Key, a.Val)
+			if setter, ok := setterMap[a.Key]; ok {
+				fmt.Fprintf(&state.buildBuf,"vgcomp.%s(%q)\n",setter,a.Val)
+			} else {
+				fmt.Fprintf(&state.buildBuf, "vgcomp.%s = %q\n", a.Key, a.Val)
+			}
 		} else {
 			// otherwise we use an "AttrMap"
 			if !didAttrMap {
